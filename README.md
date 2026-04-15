@@ -17,17 +17,51 @@ Replace this paragraph with your own summary of what your version does.
 
 ## How The System Works
 
-Explain your design in plain language.
+Real-world recommendation systems like Spotify and TikTok combine what the user likes with what each item is made of. They use strong signals such as genre and mood to group similar content, then refine the choice using numeric features like energy, tempo, valence, danceability, and acousticness. My version will prioritize songs that match the user’s preferred genre and mood first, then reward songs whose audio characteristics are closest to the user’s taste. That is why it behaves more like a content-based recommender: it scores each track on how well it matches the user profile and then ranks the tracks from best match to worst.
 
-Some prompts to answer:
+- Song features: `genre`, `mood`, `energy`, `tempo_bpm`, `valence`, `danceability`, `acousticness`
+- UserProfile features: preferred `genre`, preferred `mood`, target `energy`, target `tempo_bpm`, target `valence`, target `danceability`, target `acousticness`
 
-- What features does each `Song` use in your system
-  - For example: genre, mood, energy, tempo
-- What information does your `UserProfile` store
-- How does your `Recommender` compute a score for each song
-- How do you choose which songs to recommend
+### Algorithm Recipe
 
-You can include a simple diagram or bullet list if helpful.
+The scoring rule assigns points as follows:
+
+- **Genre match**: +2.0 points (if song.genre == user.favorite_genre)
+- **Mood match**: +1.0 point (if song.mood == user.favorite_mood)
+- **Numeric features**: For each audio feature, calculate similarity as `1 - abs(song_value - user_target)`, then apply weights:
+  - Energy: 0.5 × similarity
+  - Tempo BPM: 0.4 × similarity
+  - Valence: 0.4 × similarity
+  - Danceability: 0.4 × similarity
+  - Acousticness: 0.4 × similarity
+
+Total score = genre_score + mood_score + energy_score + tempo_score + valence_score + dance_score + acoustic_score
+
+### Data Flow Diagram
+
+```mermaid
+graph TD
+    A[Input: User Preferences] --> B[Load CSV Songs]
+    B --> C[For Each Song in CSV]
+    C --> D[Calculate Score using Algorithm Recipe]
+    D --> E[Collect Scores]
+    E --> F[Sort Scores Descending]
+    F --> G[Output: Top K Recommendations]
+```
+
+This diagram shows how each song flows from the CSV file through scoring to the final ranked list.
+
+### Example Output
+
+Here's a screenshot of the terminal output showing the top recommendations with scores and detailed reasons:
+
+![Terminal Output](Screenshots/Screenshot%202026-04-15%20at%201.58.15%E2%80%AFAM.png)
+
+### Potential Biases
+
+This system might over-prioritize genre, potentially ignoring great songs that match the user's mood but belong to a different genre. It could also favor songs with exact numeric matches, overlooking tracks that are close but not perfect in multiple features.
+
+
 
 ---
 
