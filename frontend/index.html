@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Music AI Recommender Demo</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script defer src="script.js"></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="hero-panel">
+        <div class="hero-copy">
+          <p class="eyebrow">Demo Experience</p>
+          <h1>AI Music Recommendation Flow</h1>
+          <p class="hero-text">
+            Visualize how the recommender ingests preferences, scores songs, retrieves context,
+            self-critiques, and delivers polished playlist-ready recommendations.
+          </p>
+        </div>
+        <div class="hero-actions">
+          <div class="feature-pill">
+            <span>Genre + Mood control</span>
+          </div>
+          <div class="feature-pill">
+            <span>Dynamic backend reasoning</span>
+          </div>
+          <div class="feature-pill">
+            <span>Spotify-style UI</span>
+          </div>
+        </div>
+      </header>
+
+      <main class="grid-layout">
+        <section class="panel preference-panel">
+          <h2>1. Set Your Listening Profile</h2>
+          <p>Select your preferred genre, mood, and fine-tune audio features.
+          </p>
+          <form id="preferencesForm">
+            <div class="field-row">
+              <label for="genreSelect">Preferred Genre</label>
+              <select id="genreSelect"></select>
+            </div>
+            <div class="field-row">
+              <label for="moodSelect">Preferred Mood</label>
+              <select id="moodSelect"></select>
+            </div>
+            <div class="slider-group">
+              <label>Target Energy <span id="energyValue">0.50</span></label>
+              <input type="range" id="energySlider" min="0" max="1" step="0.01" value="0.50" />
+            </div>
+            <div class="slider-group">
+              <label>Target Valence <span id="valenceValue">0.50</span></label>
+              <input type="range" id="valenceSlider" min="0" max="1" step="0.01" value="0.50" />
+            </div>
+            <div class="slider-group">
+              <label>Target Danceability <span id="danceValue">0.50</span></label>
+              <input type="range" id="danceSlider" min="0" max="1" step="0.01" value="0.50" />
+            </div>
+            <div class="slider-group">
+              <label>Target Acousticness <span id="acousticValue">0.50</span></label>
+              <input type="range" id="acousticSlider" min="0" max="1" step="0.01" value="0.50" />
+            </div>
+            <div class="slider-group">
+              <label>Target Tempo (BPM) <span id="tempoValue">100</span></label>
+              <input type="range" id="tempoSlider" min="40" max="180" step="1" value="100" />
+            </div>
+            <button type="button" id="runButton">Run Recommendation</button>
+          </form>
+        </section>
+
+        <section class="panel process-panel">
+          <div class="process-header">
+            <h2>2. Backend Recommendation Flow</h2>
+            <p>Watch the agentic pipeline unfold with knowledge retrieval, scoring, ranking, and critique.</p>
+          </div>
+          <div class="process-steps" id="processSteps"></div>
+          <div class="knowledge-box" id="knowledgeBox">
+            <h3>Knowledge Retrieval</h3>
+            <p id="knowledgeText">Pick a genre and mood to reveal the system's context-aware reasoning.</p>
+          </div>
+        </section>
+
+        <section class="panel results-panel">
+          <div class="results-header">
+            <h2>3. Recommended Tracks</h2>
+            <p>Top songs generated from scoring logic, confidence, and preference matching.</p>
+          </div>
+          <div id="recommendations" class="recommendations"></div>
+          <div class="critique-card" id="critiqueCard">
+            <h3>Self-Critique</h3>
+            <p id="critiqueText">Run the demo to see the AI judge its own recommendation confidence.</p>
+          </div>
+        </section>
+      </main>
+
+      <section class="panel footer-panel">
+        <h2>Project Requirements Covered</h2>
+        <div class="objective-grid">
+          <div class="objective-card"><strong>Preference Input</strong><span>Genre, mood, and numeric feature controls.</span></div>
+          <div class="objective-card"><strong>Backend Process</strong><span>Shows analysis, retrieval, scoring, ranking, and critique.</span></div>
+          <div class="objective-card"><strong>Visual Design</strong><span>Modern music-app UI with animated cards.</span></div>
+          <div class="objective-card"><strong>Explainability</strong><span>Scores, confidence and reasoning are visible.</span></div>
+          <div class="objective-card"><strong>Self-Critique</strong><span>AI evaluates recommendation quality automatically.</span></div>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
