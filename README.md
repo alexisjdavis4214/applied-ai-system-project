@@ -1,5 +1,10 @@
 # Music Recommender AI System
 
+**Loom Walkthrough:** [Add your Loom link here]  
+**GitHub:** [https://github.com/alexisjdavis4214/applied-ai-system-project](https://github.com/alexisjdavis4214/applied-ai-system-project)
+
+---
+
 ## Original Project
 
 This project originated as the **Music Recommender Simulation** from Modules 1-3. The original goal was to build a small rule-based music recommender that represented songs and user taste profiles as structured data, then ranked songs by scoring how closely each one matched a user's preferred genre, mood, and audio features. It could load a CSV catalog of songs, compute similarity scores, and output a ranked list with written explanations — modeling the core mechanics behind real-world recommenders like Spotify's Discover Weekly.
@@ -262,9 +267,7 @@ Everything runs offline using local CSV and JSON files. This guarantees reproduc
 
 ### What this project taught me about AI and problem-solving
 
-Building this system from scratch made the abstract concrete. Recommendation algorithms are taught as math, but implementing one means confronting decisions like: *How much should genre mismatch penalize a song? What does "confidence" actually mean in context?* The answer to both questions changed over the course of the project. I initially thought confidence should reflect how competitive the top recommendation was. It took a failing self-critique output — reporting "low confidence" on a recommendation that was objectively near-perfect — to realize the formula was measuring the wrong thing entirely.
-
-More broadly, this project taught me that AI reliability is an active design choice, not a default. Logging, validation, self-critique, and a test harness all had to be deliberately added. Without them, the system would have silently produced misleading outputs.
+Building this system from scratch made the abstract concrete. Recommendation algorithms are taught as math, but implementing one means confronting decisions like: *How much should genre mismatch penalize a song? What does "confidence" actually mean in context?* The answer to both questions changed over the course of the project. I initially thought confidence should reflect how competitive the top recommendation was. It took a failing self-critique output (reporting "low confidence" on a recommendation that was objectively near-perfect) to realize the formula was measuring the wrong thing entirely.
 
 ### Limitations and biases
 
@@ -275,7 +278,7 @@ More broadly, this project taught me that AI reliability is an active design cho
 
 ### Could this AI be misused?
 
-The system itself is low-stakes — it recommends songs. However, the *pattern* it represents (scoring user profiles against a catalog and retrieving matched content) is the same pattern used in content filtering, targeted advertising, and hiring screens. In those contexts, poorly chosen weights or a biased catalog could systematically disadvantage certain groups. The safeguard built into this design — transparent, per-feature scoring — is a meaningful mitigation: you can audit exactly why any recommendation was made. Any system that uses this pattern for high-stakes decisions should surface that breakdown to affected users.
+The system itself is low-stakes as it only recommends songs. However, the pattern it represents (scoring user profiles against a catalog and retrieving matched content) is the same pattern used in content filtering, targeted advertising, and hiring screens. In those contexts, poorly chosen weights or a biased catalog could systematically disadvantage certain groups. The safeguard built into this design (transparent, per-feature scoring) is a meaningful mitigation: you can audit exactly why any recommendation was made. Any system that uses this pattern for high-stakes decisions should surface that breakdown to affected users.
 
 ### What surprised me while testing
 
@@ -290,3 +293,11 @@ This project was developed with the assistance of Claude (Anthropic).
 **One helpful suggestion:** When I described that confidence scores were always near zero, Claude identified that the formula was computing a relative gap between ranked competitors (`(score - next_score) / score`) rather than an absolute measure of fit. It suggested redefining confidence as `score / max_possible_score`, where the theoretical maximum (5.1) is derived directly from the scoring weights. This was the right fix — confidence immediately became meaningful and the self-critique output became accurate.
 
 **One flawed suggestion:** When expanding the song catalog, the AI generated a set of songs with numeric feature values that were plausible-looking but not independently verified. Several songs in early drafts had identical `acousticness` values for very different genres (e.g., metal and folk both at 0.88), which would have produced unrealistically similar scores for unrelated profiles. I caught this by scanning the CSV and manually adjusting outliers. The lesson: AI-generated training data needs human review — the model will produce internally consistent-looking numbers without any guarantee they reflect real-world distributions.
+
+---
+
+## Portfolio
+
+**What this project says about me as an AI engineer:**
+
+This project shows that I can take an AI concept from first principles to a working, evaluated system — not just get something running, but ask whether it's actually working correctly. The most important moment in this project wasn't writing the recommender; it was catching that the self-critique module was producing confident-sounding output that contradicted itself, tracking that down to a flawed confidence formula, and fixing it. That kind of critical reading of your own system's output — treating "it runs" as different from "it's correct" — is something I now apply by default. I build things I can audit: every recommendation in this system comes with a line-by-line score breakdown, every run is logged, and the system evaluates itself before presenting results. I want to keep building AI that is transparent about what it knows, what it doesn't, and when to say so.

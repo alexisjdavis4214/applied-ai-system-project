@@ -1,119 +1,71 @@
-const genreSelect = document.getElementById("genreSelect");
-const moodSelect = document.getElementById("moodSelect");
-const energySlider = document.getElementById("energySlider");
-const valenceSlider = document.getElementById("valenceSlider");
-const danceSlider = document.getElementById("danceSlider");
-const acousticSlider = document.getElementById("acousticSlider");
-const tempoSlider = document.getElementById("tempoSlider");
-const energyValue = document.getElementById("energyValue");
-const valenceValue = document.getElementById("valenceValue");
-const danceValue = document.getElementById("danceValue");
-const acousticValue = document.getElementById("acousticValue");
-const tempoValue = document.getElementById("tempoValue");
-const runButton = document.getElementById("runButton");
-const processSteps = document.getElementById("processSteps");
-const knowledgeText = document.getElementById("knowledgeText");
+const vibeInput        = document.getElementById("vibeInput");
+const runButton        = document.getElementById("runButton");
+const processSteps     = document.getElementById("processSteps");
+const knowledgeText    = document.getElementById("knowledgeText");
 const recommendationsNode = document.getElementById("recommendations");
-const critiqueText = document.getElementById("critiqueText");
-
-const genres = [
-  "ambient",
-  "classical",
-  "country",
-  "electronic",
-  "folk",
-  "hip-hop",
-  "indie pop",
-  "jazz",
-  "lofi",
-  "pop",
-  "reggae",
-  "rock",
-  "rnb",
-  "synthwave"
-];
-
-const moods = [
-  "chill",
-  "confident",
-  "calm",
-  "dreamy",
-  "happy",
-  "heartfelt",
-  "intense",
-  "focused",
-  "laid-back",
-  "moody",
-  "nostalgic",
-  "relaxed"
-];
+const critiqueText     = document.getElementById("critiqueText");
+const interpretedPrefs = document.getElementById("interpretedPrefs");
+const prefChips        = document.getElementById("prefChips");
+const featureBars      = document.getElementById("featureBars");
 
 const defaultSteps = [
-  { id: "analyze", title: "Analyzing preferences", detail: "Checking genre, mood, and target audio features." },
-  { id: "retrieve", title: "Retrieving context", detail: "Looking up genre and mood knowledge for better decisions." },
-  { id: "score", title: "Scoring songs", detail: "Comparing every track against the user's taste profile." },
-  { id: "rank", title: "Ranking selections", detail: "Sorting by relevance, score, and confidence." },
-  { id: "critique", title: "Self-critique", detail: "Reviewing the recommendation set for reliability and fit." }
+  { title: "Parsing vibe",       detail: "Reading your words to detect genre, mood, and audio feature signals." },
+  { title: "Retrieving context", detail: "Looking up genre and mood knowledge for better decisions." },
+  { title: "Scoring songs",      detail: "Comparing every track against the translated taste profile." },
+  { title: "Ranking selections", detail: "Sorting by relevance, score, and confidence." },
+  { title: "Self-critique",      detail: "Reviewing the recommendation set for reliability and fit." }
 ];
-
-function populateSelectors() {
-  genres.forEach((genre) => {
-    const option = document.createElement("option");
-    option.value = genre;
-    option.textContent = genre;
-    genreSelect.appendChild(option);
-  });
-
-  moods.forEach((mood) => {
-    const option = document.createElement("option");
-    option.value = mood;
-    option.textContent = mood;
-    moodSelect.appendChild(option);
-  });
-
-  genreSelect.value = "lofi";
-  moodSelect.value = "chill";
-}
-
-function updateSliderLabels() {
-  energyValue.textContent = energySlider.value;
-  valenceValue.textContent = valenceSlider.value;
-  danceValue.textContent = danceSlider.value;
-  acousticValue.textContent = acousticSlider.value;
-  tempoValue.textContent = tempoSlider.value;
-}
-
-function buildProcessStep(step, index) {
-  const node = document.createElement("div");
-  node.className = "process-step";
-  if (index === 0) node.classList.add("active");
-  node.innerHTML = `<h3>${step.title}</h3><p>${step.detail}</p>`;
-  return node;
-}
 
 function showProcessSteps() {
   processSteps.innerHTML = "";
   defaultSteps.forEach((step) => {
-    processSteps.appendChild(buildProcessStep(step));
+    const node = document.createElement("div");
+    node.className = "process-step";
+    node.innerHTML = `<h3>${step.title}</h3><p>${step.detail}</p>`;
+    processSteps.appendChild(node);
   });
 }
 
 function animateSteps() {
-  const stepNodes = Array.from(processSteps.children);
-  stepNodes.forEach((node, idx) => {
-    setTimeout(() => {
-      node.classList.add("active");
-    }, idx * 450);
+  Array.from(processSteps.children).forEach((node, idx) => {
+    setTimeout(() => node.classList.add("active"), idx * 450);
   });
+}
+
+function featureBar(label, value, displayLabel) {
+  const pct = Math.round(value * 100);
+  const display = displayLabel || `${pct}%`;
+  return `
+    <div class="feature-bar-row">
+      <span class="feature-bar-label">${label}</span>
+      <div class="feature-bar-track">
+        <div class="feature-bar-fill" style="width:${pct}%"></div>
+      </div>
+      <span class="feature-bar-value">${display}</span>
+    </div>`;
+}
+
+function displayInterpretedPrefs(prefs) {
+  prefChips.innerHTML = `
+    <div class="pref-chip genre-chip">Genre <strong>${prefs.favorite_genre}</strong></div>
+    <div class="pref-chip mood-chip">Mood <strong>${prefs.favorite_mood}</strong></div>
+  `;
+  const tempoPct = (prefs.target_tempo_bpm - 40) / (180 - 40);
+  featureBars.innerHTML =
+    featureBar("Energy",       prefs.target_energy) +
+    featureBar("Valence",      prefs.target_valence) +
+    featureBar("Danceability", prefs.target_danceability) +
+    featureBar("Acousticness", prefs.target_acousticness) +
+    featureBar("Tempo",        tempoPct, `${Math.round(prefs.target_tempo_bpm)} BPM`);
+  interpretedPrefs.classList.add("visible");
 }
 
 function renderRecommendations(recs) {
   recommendationsNode.innerHTML = "";
   if (!recs.length) {
-    recommendationsNode.innerHTML = `<p class='empty-state'>Choose preferences and run the demo for personalized songs.</p>`;
+    recommendationsNode.innerHTML = `<p class="empty-state">Describe your vibe and run AuraTune for personalized songs.</p>`;
     return;
   }
-
   recs.forEach((rec, index) => {
     const card = document.createElement("div");
     card.className = "track-card";
@@ -138,57 +90,57 @@ function renderRecommendations(recs) {
 }
 
 async function runRecommendationFlow() {
-  const userPrefs = {
-    favorite_genre: genreSelect.value,
-    favorite_mood: moodSelect.value,
-    target_energy: parseFloat(energySlider.value),
-    target_tempo_bpm: parseFloat(tempoSlider.value),
-    target_valence: parseFloat(valenceSlider.value),
-    target_danceability: parseFloat(danceSlider.value),
-    target_acousticness: parseFloat(acousticSlider.value)
-  };
+  const vibeText = vibeInput.value.trim();
+  if (!vibeText) {
+    vibeInput.focus();
+    vibeInput.classList.add("shake");
+    setTimeout(() => vibeInput.classList.remove("shake"), 500);
+    return;
+  }
 
-  processSteps.innerHTML = "";
   showProcessSteps();
   animateSteps();
-
   knowledgeText.textContent = "Loading knowledge retrieval...";
   critiqueText.textContent = "Evaluating recommendations...";
   recommendationsNode.innerHTML = "";
+  interpretedPrefs.classList.remove("visible");
   runButton.disabled = true;
-  runButton.textContent = "Running...";
+  runButton.textContent = "Reading your vibe...";
 
   try {
     const response = await fetch("/recommend", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(userPrefs)
+      body: JSON.stringify({ vibe_text: vibeText })
     });
-    if (!response.ok) {
-      throw new Error(`Request failed: ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`Request failed: ${response.status}`);
     const data = await response.json();
+
+    if (data.parsed_prefs) displayInterpretedPrefs(data.parsed_prefs);
     knowledgeText.textContent = data.knowledge;
     renderRecommendations(data.recommendations);
     critiqueText.textContent = data.critique;
   } catch (error) {
     knowledgeText.textContent = "Unable to retrieve knowledge.";
     critiqueText.textContent = "Recommendation service error.";
-    recommendationsNode.innerHTML = `<p class='empty-state'>${error.message}</p>`;
+    recommendationsNode.innerHTML = `<p class="empty-state">${error.message}</p>`;
   } finally {
     runButton.disabled = false;
-    runButton.textContent = "Run Recommendation";
+    runButton.textContent = "Translate My Vibe";
   }
 }
 
 function initialize() {
-  populateSelectors();
-  updateSliderLabels();
   showProcessSteps();
   renderRecommendations([]);
-  [energySlider, valenceSlider, danceSlider, acousticSlider, tempoSlider].forEach((slider) => {
-    slider.addEventListener("input", updateSliderLabels);
+
+  document.querySelectorAll(".example-chip").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      vibeInput.value = chip.dataset.vibe;
+      vibeInput.focus();
+    });
   });
+
   runButton.addEventListener("click", runRecommendationFlow);
 }
 

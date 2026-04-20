@@ -3,7 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Music AI Recommender Demo</title>
+    <title>AuraTune — AI Music Recommender</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="styles.css" />
     <script defer src="script.js"></script>
   </head>
@@ -11,62 +13,54 @@
     <div class="app-shell">
       <header class="hero-panel">
         <div class="hero-copy">
-          <p class="eyebrow">Demo Experience</p>
-          <h1>AI Music Recommendation Flow</h1>
+          <p class="eyebrow">AI-Powered Music Discovery</p>
+          <h1>AuraTune</h1>
           <p class="hero-text">
-            Visualize how the recommender ingests preferences, scores songs, retrieves context,
-            self-critiques, and delivers polished playlist-ready recommendations.
+            Describe a scene, a feeling, a moment — and AuraTune translates your words into music.
+            Watch it reason in real time: parsing your vibe, retrieving context, scoring 75 tracks,
+            ranking by confidence, then critiquing its own results.
           </p>
         </div>
         <div class="hero-actions">
-          <div class="feature-pill">
-            <span>Genre + Mood control</span>
-          </div>
-          <div class="feature-pill">
-            <span>Dynamic backend reasoning</span>
-          </div>
-          <div class="feature-pill">
-            <span>Spotify-style UI</span>
-          </div>
+          <div class="feature-pill"><span>Natural language input</span></div>
+          <div class="feature-pill"><span>Vibe-to-audio translation</span></div>
+          <div class="feature-pill"><span>Confidence scoring</span></div>
+          <div class="feature-pill"><span>Agentic self-critique</span></div>
+          <div class="feature-pill"><span>RAG knowledge retrieval</span></div>
         </div>
       </header>
 
       <main class="grid-layout">
-        <section class="panel preference-panel">
-          <h2>1. Set Your Listening Profile</h2>
-          <p>Select your preferred genre, mood, and fine-tune audio features.
-          </p>
-          <form id="preferencesForm">
-            <div class="field-row">
-              <label for="genreSelect">Preferred Genre</label>
-              <select id="genreSelect"></select>
+        <section class="panel vibe-panel">
+          <h2>1. Describe Your Vibe</h2>
+          <p class="panel-subtitle">Paint a scene, a feeling, a moment. AuraTune reads your words and finds the music that fits.</p>
+
+          <div class="vibe-input-wrap">
+            <textarea
+              id="vibeInput"
+              placeholder="I'm watching rain streak down a window at night, feeling reflective and a little nostalgic..."
+              rows="5"
+            ></textarea>
+          </div>
+
+          <div class="vibe-examples">
+            <span class="example-label">Try a scene:</span>
+            <div class="example-chips">
+              <button class="example-chip" data-vibe="A late night drive through the city with neon lights blurring past, feeling electric and alive">Late night drive</button>
+              <button class="example-chip" data-vibe="Studying at a coffee shop on a rainy afternoon, calm and deeply focused">Rainy study session</button>
+              <button class="example-chip" data-vibe="Dancing at a summer rooftop party, feeling confident and completely free">Rooftop party</button>
+              <button class="example-chip" data-vibe="A lazy Sunday morning with coffee, sunlight through the curtains, absolutely no rush">Lazy Sunday</button>
+              <button class="example-chip" data-vibe="Running through the park at sunrise, feeling powerful, energetic, and unstoppable">Morning run</button>
             </div>
-            <div class="field-row">
-              <label for="moodSelect">Preferred Mood</label>
-              <select id="moodSelect"></select>
-            </div>
-            <div class="slider-group">
-              <label>Target Energy <span id="energyValue">0.50</span></label>
-              <input type="range" id="energySlider" min="0" max="1" step="0.01" value="0.50" />
-            </div>
-            <div class="slider-group">
-              <label>Target Valence <span id="valenceValue">0.50</span></label>
-              <input type="range" id="valenceSlider" min="0" max="1" step="0.01" value="0.50" />
-            </div>
-            <div class="slider-group">
-              <label>Target Danceability <span id="danceValue">0.50</span></label>
-              <input type="range" id="danceSlider" min="0" max="1" step="0.01" value="0.50" />
-            </div>
-            <div class="slider-group">
-              <label>Target Acousticness <span id="acousticValue">0.50</span></label>
-              <input type="range" id="acousticSlider" min="0" max="1" step="0.01" value="0.50" />
-            </div>
-            <div class="slider-group">
-              <label>Target Tempo (BPM) <span id="tempoValue">100</span></label>
-              <input type="range" id="tempoSlider" min="40" max="180" step="1" value="100" />
-            </div>
-            <button type="button" id="runButton">Run Recommendation</button>
-          </form>
+          </div>
+
+          <button type="button" id="runButton">Translate My Vibe</button>
+
+          <div class="interpreted-prefs" id="interpretedPrefs">
+            <h3>Interpreted as</h3>
+            <div class="pref-chips" id="prefChips"></div>
+            <div class="feature-bars" id="featureBars"></div>
+          </div>
         </section>
 
         <section class="panel process-panel">
@@ -77,7 +71,7 @@
           <div class="process-steps" id="processSteps"></div>
           <div class="knowledge-box" id="knowledgeBox">
             <h3>Knowledge Retrieval</h3>
-            <p id="knowledgeText">Pick a genre and mood to reveal the system's context-aware reasoning.</p>
+            <p id="knowledgeText">Describe your vibe and run AuraTune to reveal context-aware reasoning.</p>
           </div>
         </section>
 
@@ -89,7 +83,7 @@
           <div id="recommendations" class="recommendations"></div>
           <div class="critique-card" id="critiqueCard">
             <h3>Self-Critique</h3>
-            <p id="critiqueText">Run the demo to see the AI judge its own recommendation confidence.</p>
+            <p id="critiqueText">Run AuraTune to see the AI judge its own recommendation confidence.</p>
           </div>
         </section>
       </main>
@@ -97,10 +91,10 @@
       <section class="panel footer-panel">
         <h2>Project Requirements Covered</h2>
         <div class="objective-grid">
-          <div class="objective-card"><strong>Preference Input</strong><span>Genre, mood, and numeric feature controls.</span></div>
+          <div class="objective-card"><strong>Natural Language Input</strong><span>Describe a scene or mood in plain words — no sliders needed.</span></div>
+          <div class="objective-card"><strong>Vibe-to-Audio Translation</strong><span>Keywords and context map your words to genre, mood, and audio features.</span></div>
           <div class="objective-card"><strong>Backend Process</strong><span>Shows analysis, retrieval, scoring, ranking, and critique.</span></div>
-          <div class="objective-card"><strong>Visual Design</strong><span>Modern music-app UI with animated cards.</span></div>
-          <div class="objective-card"><strong>Explainability</strong><span>Scores, confidence and reasoning are visible.</span></div>
+          <div class="objective-card"><strong>Explainability</strong><span>Scores, confidence and reasoning are always visible.</span></div>
           <div class="objective-card"><strong>Self-Critique</strong><span>AI evaluates recommendation quality automatically.</span></div>
         </div>
       </section>

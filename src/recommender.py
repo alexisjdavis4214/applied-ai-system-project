@@ -220,6 +220,99 @@ def self_critique_recommendations(recommendations: List[Tuple[Dict, float, str, 
     return critique
 
 
+def parse_vibe_to_preferences(vibe_text: str, knowledge_path: str = "data/knowledge.json") -> Dict:
+    """Translate a natural language scene or feeling into structured audio preferences."""
+    text = vibe_text.lower()
+
+    genre_keywords = {
+        "lofi":       ["lo-fi", "lofi", "lo fi", "coffee shop", "studying", "late night studying", "bedroom", "coding session"],
+        "pop":        ["pop", "radio", "catchy", "mainstream", "summer hit", "party", "fun", "summer", "anthem"],
+        "rock":       ["rock", "guitar riff", "band", "electric guitar", "stadium"],
+        "ambient":    ["ambient", "atmospheric", "background", "drone", "soundscape", "floating"],
+        "jazz":       ["jazz", "saxophone", "trumpet", "improvisation", "late night bar", "smoky"],
+        "synthwave":  ["synthwave", "retro", "80s", "neon", "night drive", "retrowave", "cyberpunk"],
+        "indie pop":  ["indie", "indie pop", "bedroom pop", "alternative"],
+        "classical":  ["classical", "orchestra", "symphony", "violin", "piano concerto", "concert hall"],
+        "hip-hop":    ["hip-hop", "hip hop", "hiphop", "rap", "bars", "flow", "street", "urban"],
+        "country":    ["country", "rural", "southern", "country roads", "barn", "open road"],
+        "electronic": ["electronic", "edm", "techno", "house", "club", "rave", "dance floor", "dancing", "festival", "bass"],
+        "folk":       ["folk", "campfire", "fireplace", "storytelling", "acoustic", "hiking", "nature"],
+        "reggae":     ["reggae", "tropical", "island", "beach", "jamaican", "sunshine", "waves"],
+        "rnb":        ["r&b", "rnb", "smooth", "groove", "silky", "velvet"],
+        "metal":      ["metal", "heavy metal", "headbang", "mosh", "aggressive", "rage"],
+        "blues":      ["blues", "bluesy", "delta blues", "soulful guitar"],
+        "latin":      ["latin", "salsa", "bossa nova", "samba", "flamenco", "fiesta"],
+        "trap":       ["trap", "808", "drill", "hype", "flex"],
+        "soul":       ["soul", "soulful", "gospel", "heartfelt singing"],
+    }
+
+    mood_keywords = {
+        "chill":      ["chill", "chilling", "laid back", "mellow", "easygoing"],
+        "happy":      ["happy", "joy", "cheerful", "celebration", "bright", "sunny", "smile", "excited"],
+        "intense":    ["intense", "aggressive", "powerful", "fierce", "adrenaline"],
+        "moody":      ["moody", "reflective", "contemplative", "pensive", "brooding", "introspective"],
+        "focused":    ["focused", "studying", "working", "coding", "concentration", "productive"],
+        "relaxed":    ["relaxed", "unwinding", "de-stress", "zen", "peaceful"],
+        "nostalgic":  ["nostalgic", "memories", "reminiscing", "throwback", "childhood"],
+        "confident":  ["confident", "empowered", "determined", "strong", "boss"],
+        "heartfelt":  ["heartfelt", "emotional", "touching", "moving", "tender"],
+        "dreamy":     ["dreamy", "dream", "floating", "ethereal", "surreal", "hazy"],
+        "calm":       ["calm", "serene", "tranquil", "still", "quiet"],
+        "laid-back":  ["laid-back", "lazy", "sunday", "slow morning", "no rush"],
+        "romantic":   ["romantic", "love", "date", "candlelight", "intimate"],
+        "uplifting":  ["uplifting", "inspiring", "motivating", "hopeful", "sunrise"],
+        "energetic":  ["energetic", "pump", "workout", "running", "exercise", "hype", "electric"],
+        "dark":       ["dark", "gloomy", "somber", "shadow", "alone", "midnight"],
+    }
+
+    genre_scores = {g: sum(1 for kw in kws if kw in text) for g, kws in genre_keywords.items()}
+    detected_genre = max(genre_scores, key=genre_scores.get) if max(genre_scores.values()) > 0 else "lofi"
+
+    mood_scores = {m: sum(1 for kw in kws if kw in text) for m, kws in mood_keywords.items()}
+    detected_mood = max(mood_scores, key=mood_scores.get) if max(mood_scores.values()) > 0 else "chill"
+
+    low_e_words  = ["slow", "quiet", "gentle", "soft", "rain", "sleeping", "serene", "still", "drift", "whisper"]
+    high_e_words = ["energetic", "pump", "workout", "running", "intense", "loud", "dance", "hype", "fast", "electric"]
+    le = sum(1 for w in low_e_words if w in text)
+    he = sum(1 for w in high_e_words if w in text)
+    energy = round(max(0.1, 0.45 - le * 0.07) if le > he else (min(0.95, 0.55 + he * 0.09) if he > le else 0.5), 2)
+
+    slow_t_words = ["slow", "sleepy", "drift", "float", "hazy", "lazy"]
+    fast_t_words = ["fast", "quick", "run", "sprint", "dance", "energetic", "rush"]
+    st = sum(1 for w in slow_t_words if w in text)
+    ft = sum(1 for w in fast_t_words if w in text)
+    tempo = round(max(50.0, 88.0 - st * 8) if st > ft else (min(165.0, 102.0 + ft * 10) if ft > st else 95.0), 1)
+
+    pos_words = ["happy", "joy", "celebration", "bright", "sunny", "smile", "love", "hope", "fun", "uplifting"]
+    neg_words = ["sad", "melancholy", "crying", "dark", "gloomy", "rain", "lonely", "alone", "somber", "lost"]
+    p = sum(1 for w in pos_words if w in text)
+    n = sum(1 for w in neg_words if w in text)
+    valence = round(max(0.1, 0.45 - n * 0.07) if n > p else (min(0.95, 0.55 + p * 0.07) if p > n else 0.5), 2)
+
+    dance_words = ["dance", "groove", "rhythm", "party", "club", "bounce", "swaying"]
+    still_words = ["still", "sitting", "reading", "studying", "sleeping", "rain", "window", "quiet"]
+    dw = sum(1 for w in dance_words if w in text)
+    sw = sum(1 for w in still_words if w in text)
+    danceability = round(max(0.1, 0.45 - sw * 0.07) if sw > dw else (min(0.9, 0.55 + dw * 0.1) if dw > sw else 0.5), 2)
+
+    acoustic_words  = ["acoustic", "guitar", "piano", "natural", "organic", "unplugged", "campfire", "strings"]
+    electric_words  = ["electronic", "digital", "synth", "club", "edm", "bass drop", "produced"]
+    aw = sum(1 for w in acoustic_words if w in text)
+    ew = sum(1 for w in electric_words if w in text)
+    acousticness = round(min(0.9, 0.55 + aw * 0.08) if aw > ew else (max(0.1, 0.45 - ew * 0.08) if ew > aw else 0.5), 2)
+
+    logger.info(f"Vibe parsed: genre={detected_genre}, mood={detected_mood}, energy={energy}, tempo={tempo}")
+    return {
+        "favorite_genre":      detected_genre,
+        "favorite_mood":       detected_mood,
+        "target_energy":       energy,
+        "target_tempo_bpm":    tempo,
+        "target_valence":      valence,
+        "target_danceability": danceability,
+        "target_acousticness": acousticness,
+    }
+
+
 def agentic_recommend_workflow(user_prefs: Dict, songs: List[Dict], k: int = 5) -> List[Tuple[Dict, float, str, float]]:
     """Agentic Workflow: Multi-step reasoning with observable steps."""
     logger.info("Step 1: Analyzing user preferences")

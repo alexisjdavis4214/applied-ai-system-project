@@ -10,7 +10,7 @@ SRC_DIR = ROOT_DIR / "src"
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
-from recommender import load_songs, recommend_songs, self_critique_recommendations, retrieve_knowledge
+from recommender import load_songs, recommend_songs, self_critique_recommendations, retrieve_knowledge, parse_vibe_to_preferences
 
 DATA_DIR = ROOT_DIR / "data"
 SONGS_CSV = DATA_DIR / "songs.csv"
@@ -48,6 +48,10 @@ class DemoRequestHandler(SimpleHTTPRequestHandler):
             return
 
         try:
+            vibe_text = user_prefs.get("vibe_text")
+            if vibe_text:
+                user_prefs = parse_vibe_to_preferences(vibe_text, str(KNOWLEDGE_JSON))
+
             songs = load_songs(str(SONGS_CSV))
             recommendations = recommend_songs(user_prefs, songs, k=5)
             knowledge = retrieve_knowledge(user_prefs, str(KNOWLEDGE_JSON))
@@ -55,6 +59,7 @@ class DemoRequestHandler(SimpleHTTPRequestHandler):
 
             payload = {
                 "knowledge": knowledge,
+                "parsed_prefs": {k: v for k, v in user_prefs.items()},
                 "recommendations": [
                     {
                         "song": rec[0],
