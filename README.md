@@ -1,6 +1,6 @@
 # Music Recommender AI System
 
-**Loom Walkthrough:** [Add your Loom link here]  
+**Loom Walkthrough:** [Watch the demo](https://www.loom.com/share/88892be803d1471d9b7cd225f96a773a)  
 **GitHub:** [https://github.com/alexisjdavis4214/applied-ai-system-project](https://github.com/alexisjdavis4214/applied-ai-system-project)
 
 ---
@@ -16,6 +16,22 @@ This project originated as the **Music Recommender Simulation** from Modules 1-3
 **Music Recommender AI System** — a content-based recommendation engine that suggests songs from a 75-track catalog based on user preferences, with built-in self-evaluation and explainability.
 
 This project matters because it demonstrates how a real AI recommendation pipeline works end-to-end: ingesting structured data, reasoning about user intent, retrieving contextual knowledge, producing ranked outputs with confidence scores, and then *critiquing its own results*. Unlike a black-box model, every recommendation comes with a human-readable breakdown of exactly why each song was chosen — making the system transparent, auditable, and trustworthy.
+
+---
+
+## Demo Screenshots
+
+**Vibe input and AI-interpreted audio features**
+![Vibe input with interpreted genre, mood, and feature bars](assets/Screenshot%202026-04-20%20at%2012.08.16%20AM.png)
+
+**Backend pipeline steps firing in real time**
+![Agentic pipeline — parsing, retrieval, scoring, ranking, critique](assets/Screenshot%202026-04-20%20at%2012.08.24%20AM.png)
+
+**Recommended tracks with scores, confidence, and reasoning**
+![Top 5 recommended tracks with per-song explanations](assets/Screenshot%202026-04-20%20at%2012.08.31%20AM.png)
+
+**Self-critique output evaluating recommendation quality**
+![Self-critique assessing average confidence and preference alignment](assets/Screenshot%202026-04-20%20at%2012.08.38%20AM.png)
 
 ---
 
@@ -300,4 +316,4 @@ This project was developed with the assistance of Claude (Anthropic).
 
 **What this project says about me as an AI engineer:**
 
-This project shows that I can take an AI concept from first principles to a working, evaluated system — not just get something running, but ask whether it's actually working correctly. The most important moment in this project wasn't writing the recommender; it was catching that the self-critique module was producing confident-sounding output that contradicted itself, tracking that down to a flawed confidence formula, and fixing it. That kind of critical reading of your own system's output — treating "it runs" as different from "it's correct" — is something I now apply by default. I build things I can audit: every recommendation in this system comes with a line-by-line score breakdown, every run is logged, and the system evaluates itself before presenting results. I want to keep building AI that is transparent about what it knows, what it doesn't, and when to say so.
+I approach AI engineering as a systems design discipline, not just a modeling exercise. I built AuraTune to be transparent by default — every recommendation exposes its scoring logic, every confidence value is grounded in the math, and the system critiques its own outputs rather than presenting results with false certainty. Adding natural language vibe parsing pushed me to think about the user experience of AI: a system that requires you to understand audio features in numeric form has already failed the user. The most meaningful thing I built here wasn't the recommendation engine — it was the feedback loop between language, inference, and self-evaluation that makes the AI's reasoning legible to anyone, not just engineers.
